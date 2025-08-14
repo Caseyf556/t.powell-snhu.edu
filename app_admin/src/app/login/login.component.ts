@@ -4,44 +4,54 @@ import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css']
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-
 export class LoginComponent implements OnInit {
-  public loginForm!: FormGroup
-  public formErrorMsg: string = 'All fields are required, please try again';
-  public formInvalid: boolean = false;
+  loginForm!: FormGroup;
+  formErrorMsg: string = '';
+  formInvalid: boolean = false;
+  isSubmitting: boolean = false;
 
   constructor(
-    private authenticationService: AuthenticationService,
+    private authService: AuthenticationService,
     private router: Router,
-    private formBuilder: FormBuilder
-  ) { }
+    private fb: FormBuilder
+  ) {}
 
-  ngOnInit() {
-    this.loginForm = this.formBuilder.group({
-      email: ['', Validators.required],
-      password: ['', Validators.required]
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  private initForm(): void {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
   public onLoginSubmit(): void {
-    this.formInvalid = this.loginForm.invalid;
-    if (this.loginForm.valid) {
-      this.doLogin();
+    this.formInvalid = false;
+    this.formErrorMsg = '';
+    
+    if (this.loginForm.invalid) {
+      this.formInvalid = true;
+      this.formErrorMsg = 'Enter a new valid email and password.';
+      return;
     }
-  }
 
-  private doLogin(): void {
-    this
-      .authenticationService
-      .login(this.loginForm.value)
-      .then(() => this.router.navigateByUrl('list-trips'))
-      .catch((message) => {
-        this.formErrorMsg = message;
+    this.isSubmitting = true;
+    this.authService.login(this.loginForm.value)
+      .then(() => {
+        this.router.navigateByUrl('list-trips');
+      })
+      .catch((errorMsg: string) => {
+        this.formErrorMsg = errorMsg || 'Login failed. Please try again.';
         this.formInvalid = true;
+      })
+      .finally(() => {
+        this.isSubmitting = false;
       });
   }
 }
