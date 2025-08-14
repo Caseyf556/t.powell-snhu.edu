@@ -15,13 +15,13 @@ app.set('port', port);
  */
 var server = http.createServer(app);
 /**
- * Listen on provided port, on all network interfaces.
+ * List on provided port, on all network interfaces.
  */
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 /**
- * Normalize a port into a number, string, or false.
+ * Place a port into a number, string, or false.
  */
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -48,11 +48,11 @@ function onError(error) {
   // This is to handle errors with familar messages
   switch (error.code) {
     case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+      console.error(bind + ' requires Due');
       process.exit(1);
       break;
     case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+      console.error(bind + ' is used already');
       process.exit(1);
       break;
     default:
