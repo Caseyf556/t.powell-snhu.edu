@@ -1,40 +1,47 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
-import { AuthenticationService } from '../services/authentication';
-import { User } from '../models/user';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-selector: 'app-login',
-templateUrl: './login.component.html',
-styleUrls: ['./login.component.css']
+    selector: 'app-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.css']
 })
 
 export class LoginComponent implements OnInit {
-  public formError: string = '';
-  public credentials = {
-  name: '',
-  email: '',
-  password: ''
-  };
+  public loginForm!: FormGroup
+  public formErrorMsg: string = 'All fields are required, please try again';
+  public formInvalid: boolean = false;
 
   constructor(
-  private router: Router,
-  private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private router: Router,
+    private formBuilder: FormBuilder
   ) { }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.loginForm = this.formBuilder.group({
+      email: ['', Validators.required],
+      password: ['', Validators.required]
+    });
+  }
+
   public onLoginSubmit(): void {
-    this.formError = '';
-    if (!this.credentials.email || !this.credentials.password) {
-      this.formError = 'All fields are required, please try again';
-      } else {
-        this.doLogin();
-      }
+    this.formInvalid = this.loginForm.invalid;
+    if (this.loginForm.valid) {
+      this.doLogin();
+    }
   }
 
   private doLogin(): void {
-    this.authenticationService.login(this.credentials)
-      .then(() => this.router.navigateByUrl('#'))
-      .catch((message) => this.formError = message);
+    this
+      .authenticationService
+      .login(this.loginForm.value)
+      .then(() => this.router.navigateByUrl('list-trips'))
+      .catch((message) => {
+        this.formErrorMsg = message;
+        this.formInvalid = true;
+      });
   }
 }
