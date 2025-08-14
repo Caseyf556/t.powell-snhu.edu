@@ -7,6 +7,7 @@ const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const hbs = require('hbs');
 const passport = require('passport');
+const helmet = require('helmet');
 
 require('./app_api/database/db');
 require('./app_api/config/passport');
@@ -23,36 +24,33 @@ const apiRouter = require('./app_api/routes/index');
 
 const app = express();
 
+// Security headers
+app.use(helmet());
+
 // View engine setup
 app.set('views', path.join(__dirname, 'app_server', 'views'));
-// Register handlebars partials (https://www.npmjs.com/package/hbs)
 hbs.registerPartials(path.join(__dirname, 'app_server', 'views/partials'));
 app.set('view engine', 'hbs');
 
-app.use(logger('dev'));
+// Middleware
+if (process.env.NODE_ENV === 'development') {
+  app.use(logger('dev'));
+}
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(passport.initialize());
 
-// Allow CORS
+// CORS setup for API routes
 app.use('/api', (req, res, next) => {
-  res.header(
-    'Access-Control-Allow-Origin',
-    'http://localhost:4200'
-  );
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin,X-Requested-With, Content-Type, Accept, Authorization'
-  );
-  res.header(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE'
-  );
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
   next();
 });
 
+// Routes
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/about', aboutRouter);
@@ -63,34 +61,29 @@ app.use('/rooms', roomsRouter);
 app.use('/travel', travelRouter);
 app.use('/api', apiRouter);
 
-// Catch unauthorized user errors
+// JWT error handler
 app.use((err, req, res, next) => {
-  if (err.name === "UnauthorizedError") {
-    res
-      .status(401)
-      .json({
-        message: `${err.name}: ${err.message}`
-      });
+  if (err.name === 'UnauthorizedError') {
+    res.status(401).json({ message: `${err.name}: ${err.message}` });
+  } else {
+    next(err);
   }
 });
 
-// Catch 404 and forward to error handler
-app.use(function(req, res, next) {
+// 404 handler
+app.use((req, res, next) => {
   next(createError(404));
 });
 
-// Error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+// General error handler
+app.use((err, req, res, next) => {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // Render the error page
   res.status(err.status || 500);
   res.render('error');
 });
 
-// Custom Handlebars helper to check if the current page matches the active page
+// Handlebars helpers
 hbs.registerHelper('activePage', function(page, options) {
   const currentPage = options.data.root.activePage;
   return currentPage === page ? 'selected' : '';
@@ -99,6 +92,10 @@ hbs.registerHelper('activePage', function(page, options) {
 hbs.registerHelper('activePageFooter', function(page, options) {
   const currentPage = options.data.root.activePage;
   return currentPage === page ? 'active' : '';
+});
+
+hbs.registerHelper('ifEquals', function(arg1, arg2, options) {
+  return arg1 === arg2 ? options.fn(this) : options.inverse(this);
 });
 
 module.exports = app;
