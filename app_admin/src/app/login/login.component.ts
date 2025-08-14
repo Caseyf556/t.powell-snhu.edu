@@ -34,20 +34,25 @@ export class LoginComponent implements OnInit {
   public onLoginSubmit(): void {
     this.formInvalid = false;
     this.formErrorMsg = '';
-    
+
     if (this.loginForm.invalid) {
       this.formInvalid = true;
-      this.formErrorMsg = 'Enter a new valid email and password.';
+      this.formErrorMsg = 'Enter a valid email and password.';
       return;
     }
 
     this.isSubmitting = true;
     this.authService.login(this.loginForm.value)
       .then(() => {
+        this.loginForm.reset();
         this.router.navigateByUrl('list-trips');
       })
-      .catch((errorMsg: string) => {
-        this.formErrorMsg = errorMsg || 'Login failed. Please try again.';
+      .catch((error: any) => {
+        if (error?.status === 401) {
+          this.formErrorMsg = 'Login Failed. Please try again.';
+        } else {
+          this.formErrorMsg = error?.message || 'Login failed. Please try again.';
+        }
         this.formInvalid = true;
       })
       .finally(() => {
