@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { Router } from "@angular/router";
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TripDataService } from '../services/trip-data.service';
 
 @Component({
@@ -9,17 +9,21 @@ import { TripDataService } from '../services/trip-data.service';
   styleUrls: ['./add-trip.component.css']
 })
 export class AddTripComponent implements OnInit {
-  addForm: FormGroup;
+  addTripForm!: FormGroup;
   submitted = false;
 
   constructor(
-  private formBuilder: FormBuilder,
-  private router: Router,
-  private tripService: TripDataService
-  ) { }
+    private formBuilder: FormBuilder,
+    private router: Router,
+    private tripService: TripDataService
+  ) {}
 
-  ngOnInit() {
-    this.addForm = this.formBuilder.group({
+  ngOnInit(): void {
+    this.initializeForm();
+  }
+
+  private initializeForm(): void {
+    this.addTripForm = this.formBuilder.group({
       _id: [],
       code: ['', Validators.required],
       name: ['', Validators.required],
@@ -29,20 +33,27 @@ export class AddTripComponent implements OnInit {
       perPerson: ['', Validators.required],
       image: ['', Validators.required],
       description: ['', Validators.required],
-    })
-  }
-
-  onSubmit() {
-    this.submitted = true;
-    if(this.addForm.valid){
-    this.tripService.addTrip(this.addForm.value)
-    .then( data => {
-      console.log(data);
-      this.router.navigate(['']);
     });
   }
-}
 
-// get the form short name to access the form fields
-get f() { return this.addForm.controls; }
+  get formControls() {
+    return this.addTripForm.controls;
+  }
+
+  onFormSubmit(): void {
+    this.submitted = true;
+
+    if (this.addTripForm.invalid) {
+      return;
+    }
+
+    this.tripService.addTrip(this.addTripForm.value)
+      .then(response => {
+        console.log('Trip added:', response);
+        this.router.navigate(['/']);
+      })
+      .catch(error => {
+        console.error('Error adding trip:', error);
+      });
+  }
 }
