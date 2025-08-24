@@ -1,0 +1,18 @@
+Full-Stack Web Application Project
+Design, Development, and Reflections
+
+For this project, I built a full-stack web application using a combination of technologies that allowed me to create a responsive, secure, and maintainable system. I chose Express.js, Handlebars, JavaScript, and MongoDB because they gave me the flexibility to design both the frontend and backend in a way that felt cohesive and scalable.
+
+On the frontend, I used HTML and JavaScript to manage routing, controller logic, and dynamic content. I integrated Handlebars to maintain consistent layouts across different views, and I developed a Single-Page Application (SPA) specifically for administrative tasks. This SPA runs entirely on one page, which made it easier for site admins to update content and manage the system without jumping between multiple pages.
+
+For the backend, I implemented MongoDB, a NoSQL database that allowed me to store trip data and user login information without being restricted by a rigid schema. This flexibility was especially useful as the project evolved and new features were added.
+
+As I worked through development, I focused on improving the codebase in two key ways. First, I created reusable components for common HTML elements like headers and footers. This made the code cleaner and easier to maintain. Second, I enabled dynamic data loading so that pages could pull content directly from the database. This improved responsiveness and reduced the need for manual updates.
+
+Reusability played a big role in the overall design. By centralizing components, I was able to ensure a consistent look and feel across the application while simplifying future updates. It also made the interface smoother and more intuitive for users.
+
+I spent time testing all API endpoints using GET, POST, PUT, and DELETE methods to make sure they handled user actions securely and reliably. I implemented validation and authorization checks to protect sensitive data and prevent unauthorized access. Security was a priority throughout the project, and I made sure every endpoint was built with confidentiality and integrity in mind.
+
+This project gave me hands-on experience with both frontend and backend development. Even with a busy schedule, I was able to dive deep into the architecture and come away with a stronger understanding of how scalable systems are built. I learned how to structure a maintainable codebase, how to integrate secure workflows, and how to design user-centered tools that actually solve problems.
+
+In the process, I strengthened my skills in secure coding, modular design, dynamic content integration, and API testing. These are marketable skills that I’ll carry forward into future roles—especially in environments where security, scalability, and user experience are critical.
